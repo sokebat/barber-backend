@@ -16,6 +16,8 @@ builder.Services.AddOpenApi();
 // 🔹 Register Application Services
 builder.Services.AddScoped<ITeamRepository, TeamRepository>();
 builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IOurServicesRepository, OurServicesRepository>();
+builder.Services.AddScoped<IOurServicesService, OurServicesService>();
 
 
 // 🔹 Register Database Context
