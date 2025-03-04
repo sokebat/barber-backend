@@ -14,8 +14,8 @@ builder.Services.AddOpenApi();
 
 
 // 🔹 Register Application Services
-builder.Services.AddScoped<IBarberRepository, BarberRepository>();
-builder.Services.AddScoped<IBarberService, BarberService>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 
 // 🔹 Register Database Context

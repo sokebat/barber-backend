@@ -1,5 +1,4 @@
-﻿ 
-using BarberApp.Domain;
+﻿using BarberApp.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace BarberApp.Persistence
@@ -10,6 +9,6 @@ namespace BarberApp.Persistence
         {
         }
 
-        public DbSet<Barber> Barbers { get; set; }
+        public DbSet<Team> Team { get; set; }
     }
 }
