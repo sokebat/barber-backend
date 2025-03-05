@@ -11,5 +11,7 @@ namespace BarberApp.Persistence
 
         public DbSet<Team> Team { get; set; }
         public DbSet<OurServices> OurServices { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Product> Product { get; set; }
     }
 }
