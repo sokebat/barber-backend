@@ -8,7 +8,7 @@
 
         public required string Description { get; set; }
 
-        public string? ProfileImageUrl { get; set; }  
+        public string? ProfileImageUrl { get; set; }    
 
         public required string Specialty { get; set; }  
     }
