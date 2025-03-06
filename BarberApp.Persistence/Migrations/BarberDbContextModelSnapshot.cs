@@ -3,19 +3,16 @@ using System;
 using BarberApp.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BarberApp.API.Migrations
+namespace BarberApp.Persistence.Migrations
 {
     [DbContext(typeof(BarberDbContext))]
-    [Migration("20250306033024_changedb01")]
-    partial class changedb01
+    partial class BarberDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -36,12 +33,16 @@ namespace BarberApp.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("SpecialistName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("id");
 

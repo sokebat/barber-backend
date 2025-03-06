@@ -73,7 +73,7 @@ namespace BarberApp.API.Controllers
             {
                 return BadRequest(new { message = "Invalid appointment data." });  // 400 - Bad Request
             }
-            if (appointment.TeamId <= 0)
+            if (appointment.id <= 0)
             {
                 return BadRequest(new { message = "Specialist ID, Product ID required." });
             }
