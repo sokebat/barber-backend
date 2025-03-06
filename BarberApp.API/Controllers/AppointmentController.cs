@@ -1,5 +1,6 @@
 ﻿using BarberApp.Application.Interface;
 using BarberApp.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace BarberApp.API.Controllers
 {
@@ -65,8 +66,8 @@ namespace BarberApp.API.Controllers
             }
 
         }
-
-        [HttpPost]
+        [Authorize]
+        [HttpPost("book")]
         public async Task<IActionResult> AddAppointment([FromBody] Appointment appointment)
         {
             if (appointment == null)

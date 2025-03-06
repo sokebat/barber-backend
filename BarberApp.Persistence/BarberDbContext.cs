@@ -23,5 +23,6 @@ namespace BarberApp.Persistence
         public DbSet<Category> Category { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }
