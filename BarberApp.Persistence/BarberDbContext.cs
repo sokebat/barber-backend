@@ -5,8 +5,17 @@ namespace BarberApp.Persistence
 {
     public class BarberDbContext : DbContext
     {
-        public BarberDbContext(DbContextOptions<BarberDbContext> options) : base(options)
+       
+
+        public BarberDbContext(DbContextOptions<BarberDbContext> options)
+       : base(options) { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite("Data Source=barber.db;");
+            }
         }
 
         public DbSet<Team> Team { get; set; }

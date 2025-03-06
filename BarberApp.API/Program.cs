@@ -3,9 +3,12 @@ using BarberApp.Application.Services;
 using BarberApp.Persistence;
 using BarberApp.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+Batteries.Init();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -20,11 +23,10 @@ builder.Services.AddScoped<IOurServicesRepository, OurServicesRepository>();
 builder.Services.AddScoped<IOurServicesService, OurServicesService>();
 
 
-// 🔹 Register Database Context
+// 🔹 Register Database Context for SQLite
 builder.Services.AddDbContext<BarberDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"),
      b => b.MigrationsAssembly("BarberApp.API")));
-
 
 
 builder.Services.AddEndpointsApiExplorer();  // This is necessary for Swagger UI to display endpoints

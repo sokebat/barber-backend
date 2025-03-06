@@ -2,11 +2,6 @@
 using BarberApp.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BarberApp.Persistence.Repository
 {
@@ -64,11 +59,7 @@ namespace BarberApp.Persistence.Repository
         {
             try
             {
-                return await _context.Appointment
-                    .Include(a => a.Team)
-                    .Include(a => a.Product)
-                    .AsNoTracking()
-                    .ToListAsync();
+                return await _context.Appointment.AsNoTracking().ToListAsync();
 
             }
             catch (Exception ex)
@@ -83,11 +74,7 @@ namespace BarberApp.Persistence.Repository
         {
             try
             {
-                var appointments = await _context.Appointment
-                    .Include(a => a.Team)
-                    .Include(a => a.Product)
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(a => a.id == id);
+                var appointments = await _context.Appointment.AsNoTracking().FirstOrDefaultAsync(a => a.id == id);
 
                 if(appointments == null)
                 {
