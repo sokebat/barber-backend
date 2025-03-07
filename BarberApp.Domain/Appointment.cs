@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace BarberApp.Domain
 {
@@ -12,20 +6,16 @@ namespace BarberApp.Domain
     {
         public int id { get; set; }
 
-        [Required]
-        public int TeamId { get; set; }
-        [ForeignKey("TeamId")]
-        public Team Team { get; set; } = null; //specialist
+        public  required string ServiceName { get; set; }
+        public required string SpecialistName { get; set; }
 
-        [Required]
-        public int ProductId { get; set; }
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; } = null; //haircut
 
-        [Required]
-        public DateTime AppointmentDate { get; set; }
-        [Required]
-        public TimeSpan AppointmentTime { get; set; }
+        public required string CustomerName { get; set; }
+       public required DateTime AppointmentDate { get; set; }
+       public required TimeSpan AppointmentTime { get; set; }
+
+        [DefaultValue(false)]
+        public bool IsApproved { get; set; } = false;
 
     }
 }

@@ -5,7 +5,7 @@ namespace BarberApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppointmentController :ControllerBase
+    public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
         public AppointmentController(IAppointmentService appointmentService)
@@ -14,18 +14,19 @@ namespace BarberApp.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult>GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
                 var appointments = await _appointmentService.GetAllAppointments();
-                if(appointments ==null || !appointments.Any())
+                if (appointments == null || !appointments.Any())
                 {
                     return NotFound(new { message = "No appointments found." });
                 }
                 return Ok(appointments);
 
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
@@ -53,7 +54,7 @@ namespace BarberApp.API.Controllers
                 return Ok(appointment);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
@@ -72,7 +73,7 @@ namespace BarberApp.API.Controllers
             {
                 return BadRequest(new { message = "Invalid appointment data." });  // 400 - Bad Request
             }
-            if (appointment.TeamId<=0 || appointment.ProductId <= 0)
+            if (appointment.id <= 0)
             {
                 return BadRequest(new { message = "Specialist ID, Product ID required." });
             }
