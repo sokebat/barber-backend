@@ -37,7 +37,8 @@ internal class Program
 
         // 🔹 Configure JWT Authentication
         var jwtKey = builder.Configuration["Jwt:Key"];
-        var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+        //var jwtIssuer = builder.Configuration["Jwt:Issuer"];  // this is in local host 
+        var jwtIssuer = "https://192.168.100.39:7236";
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
            .AddJwtBearer(options =>
