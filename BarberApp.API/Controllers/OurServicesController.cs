@@ -25,14 +25,14 @@ namespace BarberApp.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OurServices>>> GetOurServices()
         {
-            return await _context.OurServices.ToListAsync();
+            return await _context.OurServices.Include(s =>s.Data).ToListAsync();
         }
 
         // GET: api/OurServices/5
         [HttpGet("{id}")]
         public async Task<ActionResult<OurServices>> GetOurServices(int id)
         {
-            var ourServices = await _context.OurServices.FindAsync(id);
+            var ourServices = await _context.OurServices.Include(s =>s.Data).FirstOrDefaultAsync(s=>s.Id ==id);
 
             if (ourServices == null)
             {
@@ -52,7 +52,45 @@ namespace BarberApp.API.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(ourServices).State = EntityState.Modified;
+            //_context.Entry(ourServices).State = EntityState.Modified;
+            //_context.Entry(ourServices.Data).State = EntityState.Modified;
+            var existingService = await _context.OurServices
+                .Include(s => s.Data)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (existingService == null)
+            {
+                return NotFound();
+            }
+
+            // Update scalar properties
+            _context.Entry(existingService).CurrentValues.SetValues(ourServices);
+
+            // Handle the Data list
+            // Remove deleted items
+            foreach (var existingData in existingService.Data.ToList())
+            {
+                if (!ourServices.Data.Any(d => d.Id == existingData.Id))
+                {
+                    _context.OurServicesData.Remove(existingData);
+                }
+            }
+
+            // Update or add items
+            foreach (var data in ourServices.Data)
+            {
+                var existingData = existingService.Data.FirstOrDefault(d => d.Id == data.Id && d.Id != 0);
+                if (existingData != null)
+                {
+                    _context.Entry(existingData).CurrentValues.SetValues(data);
+                }
+                else
+                {
+                    // Ensure new items don't have a pre-set Id
+                    data.Id = 0; // Let EF Core generate the Id
+                    existingService.Data.Add(data);
+                }
+            }
 
             try
             {
@@ -78,6 +116,17 @@ namespace BarberApp.API.Controllers
         [HttpPost]
         public async Task<ActionResult<OurServices>> PostOurServices(OurServices ourServices)
         {
+            if (ourServices == null)
+            {
+                return BadRequest("OurServices cannot be null.");
+            }
+
+            // Ensure Data items don't have pre-set IDs
+            foreach (var data in ourServices.Data)
+            {
+                data.Id = 0; // Let EF Core generate the Id
+            }
+
             _context.OurServices.Add(ourServices);
             await _context.SaveChangesAsync();
 
@@ -88,7 +137,10 @@ namespace BarberApp.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOurServices(int id)
         {
-            var ourServices = await _context.OurServices.FindAsync(id);
+            var ourServices = await _context.OurServices
+                 .Include(s => s.Data)
+                 .FirstOrDefaultAsync(s => s.Id == id);
+
             if (ourServices == null)
             {
                 return NotFound();

@@ -155,6 +155,41 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("OurServices");
                 });
 
+            modelBuilder.Entity("BarberApp.Domain.OurServicesData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("OurServicesId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subtitle")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OurServicesId");
+
+                    b.ToTable("OurServicesData");
+                });
+
             modelBuilder.Entity("BarberApp.Domain.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -342,6 +377,14 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BarberApp.Domain.OurServicesData", b =>
+                {
+                    b.HasOne("BarberApp.Domain.OurServices", null)
+                        .WithMany("Data")
+                        .HasForeignKey("OurServicesId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -391,6 +434,11 @@ namespace BarberApp.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BarberApp.Domain.OurServices", b =>
+                {
+                    b.Navigation("Data");
                 });
 #pragma warning restore 612, 618
         }
