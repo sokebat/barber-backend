@@ -237,6 +237,30 @@ namespace BarberApp.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "OurServicesData",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Image = table.Column<string>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Subtitle = table.Column<string>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    OurServicesId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OurServicesData", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OurServicesData_OurServices_OurServicesId",
+                        column: x => x.OurServicesId,
+                        principalTable: "OurServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -273,6 +297,11 @@ namespace BarberApp.Persistence.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OurServicesData_OurServicesId",
+                table: "OurServicesData",
+                column: "OurServicesId");
         }
 
         /// <inheritdoc />
@@ -300,7 +329,7 @@ namespace BarberApp.Persistence.Migrations
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "OurServices");
+                name: "OurServicesData");
 
             migrationBuilder.DropTable(
                 name: "Product");
@@ -313,6 +342,9 @@ namespace BarberApp.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "OurServices");
         }
     }
 }
