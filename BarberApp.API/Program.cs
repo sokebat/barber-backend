@@ -70,7 +70,8 @@ internal class Program
 
         builder.Services.AddScoped<IAuthService, AuthServices>();
 
-
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<IProductService, ProductService>();
 
         builder.Services.AddEndpointsApiExplorer();  // This is necessary for Swagger UI to display endpoints
         builder.Services.AddSwaggerGen();  // This generates Swagger docs for your API
