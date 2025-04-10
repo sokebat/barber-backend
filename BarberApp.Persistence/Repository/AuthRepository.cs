@@ -24,9 +24,23 @@ namespace BarberApp.Persistence.Repository
             _configuration = configuration;
         }
 
-        public async Task<string> Login(Login model)
-        {
+        //public async Task<string> Login(Login model)
+        //{
 
+        //    var user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null)
+        //        throw new Exception("Invalid email or password.");
+
+        //    var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+        //    if (!result.Succeeded)
+        //        throw new Exception("Invalid email or password.");
+        //    var token = GenerateJwtToken(user);
+        //    //return GenerateJwtToken(user);
+        //    return (token, user.FullName);
+
+        //}
+        public async Task<(string Token, string FullName)> Login(Login model)
+        {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 throw new Exception("Invalid email or password.");
@@ -35,7 +49,8 @@ namespace BarberApp.Persistence.Repository
             if (!result.Succeeded)
                 throw new Exception("Invalid email or password.");
 
-            return GenerateJwtToken(user);
+            var token = GenerateJwtToken(user);
+            return (token, user.FullName); // Return both token and FullName
         }
 
         public async Task<string> Register(Register model)
