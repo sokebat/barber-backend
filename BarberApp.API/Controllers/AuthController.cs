@@ -29,13 +29,26 @@ namespace BarberApp.API.Controllers
             }
         }
 
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody] Login model)
+        //{
+        //    try
+        //    {
+        //        var token = await _authService.Login(model);
+        //        return Ok(new { token });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Unauthorized(new { error = ex.Message });
+        //    }
+        //}
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             try
             {
-                var token = await _authService.Login(model);
-                return Ok(new { token });
+                var (token, fullName) = await _authService.Login(model);
+                return Ok(new { token, fullName }); // Return both in the response
             }
             catch (Exception ex)
             {

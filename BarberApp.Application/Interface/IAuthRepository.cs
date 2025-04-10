@@ -11,7 +11,8 @@ namespace BarberApp.Application.Interface
    public interface IAuthRepository
     {
         Task<string> Register(Register model);
-        Task<string> Login(Login model);
+        //Task<string> Login(Login model);
+        Task<(string Token, string FullName)> Login(Login model);
 
     }
 }
