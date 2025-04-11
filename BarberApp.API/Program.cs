@@ -55,6 +55,23 @@ internal class Program
                    ValidAudience = jwtIssuer
                };
            });
+        var allowedOrigins = new[] {
+    "http://localhost:8080",        // Vite default
+    "http://localhost:3000",        // React default
+    "http://192.168.1.67:8000",     // Your LAN frontend
+    "http://192.168.100.39:8000"    // Optional LAN frontend
+};
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("MyCorsPolicy", policy =>
+            {
+                policy.WithOrigins(allowedOrigins)
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials(); // allow cookies & tokens
+            });
+        });
 
         builder.Services.AddAuthorization();
 
@@ -78,6 +95,7 @@ internal class Program
 
 
         var app = builder.Build();
+        app.UseCors("MyCorsPolicy");
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
