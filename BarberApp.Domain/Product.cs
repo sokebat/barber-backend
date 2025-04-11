@@ -11,7 +11,7 @@ namespace BarberApp.Domain
         [Column(TypeName = "decimal(18,2)")]
         public required decimal Price { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal discoungPrice { get; set; }
+        public decimal  DiscountPrice { get; set; }
         public required string ImageUrl { get; set; }
         
         public required string CategoryName { get; set; }
