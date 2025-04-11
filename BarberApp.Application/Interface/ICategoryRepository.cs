@@ -1,4 +1,6 @@
-﻿using BarberApp.Domain;
+﻿using BarberApp.Domain.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BarberApp.Application.Interface
 {
@@ -7,9 +9,7 @@ namespace BarberApp.Application.Interface
         Task<List<Category>> GetAllCategories();
         Task<Category> GetCategoryById(int id);
         Task AddCategory(Category category);
-        Task DeleteCategory(int id);
         Task UpdateCategory(Category category);
-
-
+        Task DeleteCategory(int id);
     }
 }

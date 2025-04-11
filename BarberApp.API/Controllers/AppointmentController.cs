@@ -1,5 +1,5 @@
 ﻿using BarberApp.Application.Interface;
-using BarberApp.Domain;
+using BarberApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 namespace BarberApp.API.Controllers
 {

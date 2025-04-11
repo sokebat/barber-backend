@@ -1,7 +1,7 @@
 ﻿using BarberApp.Application.Interface;
-using BarberApp.Domain;
+using BarberApp.Domain.Models;
 using Microsoft.Extensions.Logging;
- 
+
 
 namespace BarberApp.Application.Services
 {

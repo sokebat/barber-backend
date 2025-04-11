@@ -1,4 +1,4 @@
-﻿namespace BarberApp.Domain
+﻿namespace BarberApp.Domain.Models
 {
     public class Team
     {

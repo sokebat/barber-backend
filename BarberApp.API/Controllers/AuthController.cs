@@ -1,16 +1,20 @@
 ﻿using BarberApp.Application.Interface;
 using BarberApp.Domain;
+using BarberApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace BarberApp.API.Controllers
 {
     [Route("api/auth")]
     [ApiController]
-    public class AuthController :ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-       
+
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -23,36 +27,40 @@ namespace BarberApp.API.Controllers
             {
                 var result = await _authService.Register(model);
                 return Ok(result);
-            }catch(Exception e)
+            }
+            catch (Exception ex)
             {
-                return BadRequest(new { error = e.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
 
-        //[HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] Login model)
-        //{
-        //    try
-        //    {
-        //        var token = await _authService.Login(model);
-        //        return Ok(new { token });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Unauthorized(new { error = ex.Message });
-        //    }
-        //}
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Login model)
         {
             try
             {
-                var (token, fullName) = await _authService.Login(model);
-                return Ok(new { token, fullName }); // Return both in the response
+                var result = await _authService.Login(model);
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return Unauthorized(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var result = await _authService.GetUserProfile(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
     }

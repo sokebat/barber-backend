@@ -1,5 +1,5 @@
 ﻿using BarberApp.Application.Interface;
-using BarberApp.Domain;
+using BarberApp.Domain.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,10 @@ namespace BarberApp.Application.Services
 {
     public class AppointmentService : IAppointmentService
     {
-        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IAppointmentRepositiory _appointmentRepository;
         private readonly ILogger<AppointmentService> _logger;
 
-        public AppointmentService(IAppointmentRepository appointmentRepository, ILogger<AppointmentService> logger)
+        public AppointmentService(IAppointmentRepositiory appointmentRepository, ILogger<AppointmentService> logger)
         {
             _appointmentRepository = appointmentRepository;
             _logger = logger;

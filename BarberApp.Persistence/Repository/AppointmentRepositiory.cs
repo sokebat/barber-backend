@@ -1,11 +1,11 @@
 ﻿using BarberApp.Application.Interface;
-using BarberApp.Domain;
+using BarberApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace BarberApp.Persistence.Repository
 {
-    public class AppointmentRepositiory : IAppointmentRepository
+    public class AppointmentRepositiory : IAppointmentRepositiory
     {
         private readonly BarberDbContext _context;
         private readonly ILogger<AppointmentRepositiory> _logger;

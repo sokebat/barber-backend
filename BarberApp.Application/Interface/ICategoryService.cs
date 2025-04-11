@@ -1,15 +1,15 @@
-﻿
-
-using BarberApp.Domain;
+﻿using BarberApp.Domain.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BarberApp.Application.Interface
 {
     public interface ICategoryService
     {
-        public Task<List<Category>> GetAllCategories();
-        public Task<Category> GetCategoryById(int id);
-        public Task AddCategory(Category category);
-        public Task DeleteCategory(int id);
-        public Task UpdateCategory(Category category);
+        Task<List<Category>> GetAllCategories();
+        Task<Category> GetCategoryById(int id);
+        Task AddCategory(Category category); // Keep using Category directly
+        Task UpdateCategory(Category category);
+        Task DeleteCategory(int id);
     }
 }

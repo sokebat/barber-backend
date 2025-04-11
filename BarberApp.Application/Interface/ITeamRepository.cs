@@ -1,5 +1,5 @@
-﻿using BarberApp.Domain;
- 
+﻿using BarberApp.Domain.Models;
+
 
 namespace BarberApp.Application.Interface
 {

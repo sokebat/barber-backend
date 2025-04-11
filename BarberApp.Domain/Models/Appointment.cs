@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace BarberApp.Domain
+namespace BarberApp.Domain.Models
 {
    public class Appointment
     {

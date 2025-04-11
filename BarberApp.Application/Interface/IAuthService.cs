@@ -1,16 +1,13 @@
-﻿using BarberApp.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿ 
+using BarberApp.Domain.Models;
+ 
 
 namespace BarberApp.Application.Interface
 {
-   public interface IAuthService
+    public interface IAuthService
     {
-        Task<string> Register(Register model);
-        //Task<string> Login(Login model);
-        Task<(string Token, string FullName)> Login(Login model);
+        Task<UserResponse> Register(Register model);
+        Task<UserResponse> Login(Login model);
+        Task<UserResponse> GetUserProfile(string userId);
     }
 }

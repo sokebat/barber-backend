@@ -1,6 +1,8 @@
 ﻿using BarberApp.Application.Interface;
-using BarberApp.Domain;
+using BarberApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace BarberApp.API.Controllers
 {
@@ -12,10 +14,10 @@ namespace BarberApp.API.Controllers
 
         public CategoryController(ICategoryService categoryService)
         {
-            _categoryService = categoryService;
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
-        // ✅ Get all categories
+        // GET: api/Category
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,7 +26,7 @@ namespace BarberApp.API.Controllers
                 var categories = await _categoryService.GetAllCategories();
                 if (categories == null || !categories.Any())
                 {
-                    return NotFound(new { message = "No categories found." });
+                    return NotFound(new { Message = "No categories found." });
                 }
                 return Ok(categories);
             }
@@ -32,108 +34,124 @@ namespace BarberApp.API.Controllers
             {
                 return StatusCode(500, new
                 {
-                    message = "An error occurred while retrieving categories.",
-                    error = ex.Message
+                    Message = "An error occurred while retrieving categories.",
+                    Error = ex.Message
                 });
             }
         }
 
-        // ✅ Get category by ID
+        // GET: api/Category/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "Invalid category ID." });
-            }
-
             try
             {
                 var category = await _categoryService.GetCategoryById(id);
-                if (category == null)
-                {
-                    return NotFound(new { message = $"Category with ID {id} not found." });
-                }
                 return Ok(category);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = "An error occurred while retrieving the category.",
-                    error = ex.Message
+                    Message = "An error occurred while retrieving the category.",
+                    Error = ex.Message
                 });
             }
         }
 
-        // ✅ Add a new category
+        // POST: api/Category
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] Category category)
         {
-            if (category == null || string.IsNullOrWhiteSpace(category.Name))
-            {
-                return BadRequest(new { message = "Category name is required." });
-            }
-
             try
             {
+                if (category == null || string.IsNullOrWhiteSpace(category.Name))
+                {
+                    return BadRequest(new { Message = "Category name is required." });
+                }
+
+                // Optional: Reset Id here as an extra precaution (already done in service)
+                category.Id = 0;
                 await _categoryService.AddCategory(category);
                 return CreatedAtAction(nameof(GetById), new { id = category.Id }, category);
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = "An error occurred while adding the category.",
-                    error = ex.Message
+                    Message = "An error occurred while adding the category.",
+                    Error = ex.Message
                 });
             }
         }
 
-        // ✅ Update a category
+        // PUT: api/Category/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Category category)
         {
-            if (id <= 0 || category == null || id != category.Id)
-            {
-                return BadRequest(new { message = "Invalid category data." });
-            }
-
             try
             {
+                if (id != category.Id)
+                {
+                    return BadRequest(new { Message = "Category ID in URL does not match the provided category ID." });
+                }
+
                 await _categoryService.UpdateCategory(category);
-                return Ok(new { message = "Category updated successfully." });
+                return Ok(new { Message = "Category updated successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = "An error occurred while updating the category.",
-                    error = ex.Message
+                    Message = "An error occurred while updating the category.",
+                    Error = ex.Message
                 });
             }
         }
 
-        // ✅ Delete a category
+        // DELETE: api/Category/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "Invalid category ID." });
-            }
-
             try
             {
                 await _categoryService.DeleteCategory(id);
-                return Ok(new { message = "Category deleted successfully." });
+                return Ok(new { Message = "Category deleted successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    message = "An error occurred while deleting the category.",
-                    error = ex.Message
+                    Message = "An error occurred while deleting the category.",
+                    Error = ex.Message
                 });
             }
         }

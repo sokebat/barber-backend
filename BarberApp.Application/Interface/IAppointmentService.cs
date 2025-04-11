@@ -1,4 +1,4 @@
-﻿using BarberApp.Domain;
+﻿using BarberApp.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

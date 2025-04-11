@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BarberApp.Domain;
 using BarberApp.Persistence;
+using BarberApp.Domain.Models;
 
 namespace BarberApp.API.Controllers
 {
