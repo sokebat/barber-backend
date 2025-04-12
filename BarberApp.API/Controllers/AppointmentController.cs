@@ -1,6 +1,10 @@
 ﻿using BarberApp.Application.Interface;
 using BarberApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace BarberApp.API.Controllers
 {
     [Route("api/[controller]")]
@@ -8,9 +12,20 @@ namespace BarberApp.API.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IAppointmentService _appointmentService;
+
         public AppointmentController(IAppointmentService appointmentService)
         {
             _appointmentService = appointmentService;
+        }
+
+        // Response model to match frontend expectations
+        private class ApiResponse<T>
+        {
+            public bool Success { get; set; }
+            public T? Data { get; set; }
+            public string Message { get; set; } = string.Empty;
+            public int Status { get; set; }
+            public object? Error { get; set; }
         }
 
         [HttpGet]
@@ -19,146 +34,250 @@ namespace BarberApp.API.Controllers
             try
             {
                 var appointments = await _appointmentService.GetAllAppointments();
-                if (appointments == null || !appointments.Any())
+                var responseAppointments = appointments.Select(a => new
                 {
-                    return NotFound(new { message = "No appointments found." });
-                }
-                return Ok(appointments);
+                    id = a.Id.ToString(), // Convert int to string
+                    a.ServiceName,
+                    a.SpecialistName,
+                    a.CustomerName,
+                    a.AppointmentDate,
+                    a.AppointmentTime,
+                    a.IsApproved
+                }).ToList();
 
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Data = responseAppointments,
+                    Message = "Appointments retrieved successfully",
+                    Status = 200
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(500, new ApiResponse<object>
                 {
-                    message = "An error occurred while retrieving appointments.",
-                    error = ex.Message
+                    Success = false,
+                    Data = null,
+                    Message = "An error occurred while retrieving appointments",
+                    Status = 500,
+                    Error = ex.Message
                 });
-
             }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "Invalid appointment ID." });
-            }
             try
             {
                 var appointment = await _appointmentService.GetAppointmentById(id);
-                if (appointment == null)
+                var responseAppointment = new
                 {
-                    return NotFound(new { message = $"Appointment with ID {id} not found." });  // 404 - Not Found
-                }
-                return Ok(appointment);
+                    id = appointment.Id.ToString(), // Convert int to string
+                    appointment.ServiceName,
+                    appointment.SpecialistName,
+                    appointment.CustomerName,
+                    appointment.AppointmentDate,
+                    appointment.AppointmentTime,
+                    appointment.IsApproved
+                };
 
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Data = responseAppointment,
+                    Message = "Appointment retrieved successfully",
+                    Status = 200
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Data = null,
+                    Message = ex.Message,
+                    Status = 404
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(500, new ApiResponse<object>
                 {
-                    message = $"An error occurred while retrieving the appointment with ID {id}.",
-                    error = ex.Message
+                    Success = false,
+                    Data = null,
+                    Message = "An error occurred while retrieving the appointment",
+                    Status = 500,
+                    Error = ex.Message
                 });
-
             }
-
         }
 
         [HttpPost]
         public async Task<IActionResult> AddAppointment([FromBody] Appointment appointment)
         {
-            if (appointment == null)
-            {
-                return BadRequest(new { message = "Invalid appointment data." });  // 400 - Bad Request
-            }
-            if (appointment.id <= 0)
-            {
-                return BadRequest(new { message = "Specialist ID, Product ID required." });
-            }
             try
             {
-                await _appointmentService.AddAppointment(appointment);
-                return CreatedAtAction(nameof(GetById), new { id = appointment.id }, appointment);
+                if (appointment == null)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Data = null,
+                        Message = "Invalid appointment data",
+                        Status = 400
+                    });
+                }
 
+                // Id should be generated by the database, so ignore client-provided Id
+                appointment.Id = 0;
+
+                await _appointmentService.AddAppointment(appointment);
+                var responseAppointment = new
+                {
+                    id = appointment.Id.ToString(), // Will be set by DB
+                    appointment.ServiceName,
+                    appointment.SpecialistName,
+                    appointment.CustomerName,
+                    appointment.AppointmentDate,
+                    appointment.AppointmentTime,
+                    appointment.IsApproved
+                };
+
+                return CreatedAtAction(nameof(GetById), new { id = appointment.Id }, new ApiResponse<object>
+                {
+                    Success = true,
+                    Data = responseAppointment,
+                    Message = "Appointment created successfully",
+                    Status = 201
+                });
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentException ex)
             {
-                return Conflict(new { message = "Duplicate appointment detected.", error = ex.Message });  // 409 - Conflict
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Data = null,
+                    Message = ex.Message,
+                    Status = 400
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(500, new ApiResponse<object>
                 {
-                    message = "An error occurred while adding the appointment.",
-                    error = ex.InnerException?.Message ?? ex.Message
-                });  // 500 - Internal Server Error
+                    Success = false,
+                    Data = null,
+                    Message = "An error occurred while adding the appointment",
+                    Status = 500,
+                    Error = ex.Message
+                });
             }
-
-
-
-
-
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAppointment(int id, [FromBody] Appointment appointment)
         {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "Invalid appointment ID." });  // 400 - Bad Request
-            }
-
-            if (appointment == null || id != appointment.id)
-            {
-                return BadRequest(new { message = "Appointment data is invalid or ID mismatch." });  // 400 - Bad Request
-            }
-
             try
             {
+                if (appointment == null || id != appointment.Id)
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Data = null,
+                        Message = "Invalid appointment data or ID mismatch",
+                        Status = 400
+                    });
+                }
+
                 await _appointmentService.UpdateAppointment(appointment);
-                return NoContent();  // 204 - No Content (successful update)
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Data = new
+                    {
+                        id = appointment.Id.ToString(),
+                        appointment.ServiceName,
+                        appointment.SpecialistName,
+                        appointment.CustomerName,
+                        appointment.AppointmentDate,
+                        appointment.AppointmentTime,
+                        appointment.IsApproved
+                    },
+                    Message = "Appointment updated successfully",
+                    Status = 200
+                });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });  // 404 - Not Found
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Data = null,
+                    Message = ex.Message,
+                    Status = 404
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Data = null,
+                    Message = ex.Message,
+                    Status = 400
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(500, new ApiResponse<object>
                 {
-                    message = "An error occurred while updating the appointment.",
-                    error = ex.InnerException?.Message ?? ex.Message
-                });  // 500 - Internal Server Error
+                    Success = false,
+                    Data = null,
+                    Message = "An error occurred while updating the appointment",
+                    Status = 500,
+                    Error = ex.Message
+                });
             }
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAppointment(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest(new { message = "Invalid appointment ID." });  // 400 - Bad Request
-            }
-
             try
             {
                 await _appointmentService.DeleteAppointment(id);
-                return NoContent();  // 204 - No Content (successful delete)
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    Data = null,
+                    Message = "Appointment deleted successfully",
+                    Status = 200
+                });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });  // 404 - Not Found
+                return NotFound(new ApiResponse<object>
+                {
+                    Success = false,
+                    Data = null,
+                    Message = ex.Message,
+                    Status = 404
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
+                return StatusCode(500, new ApiResponse<object>
                 {
-                    message = "An error occurred while deleting the appointment.",
-                    error = ex.InnerException?.Message ?? ex.Message
-                });  // 500 - Internal Server Error
+                    Success = false,
+                    Data = null,
+                    Message = "An error occurred while deleting the appointment",
+                    Status = 500,
+                    Error = ex.Message
+                });
             }
         }
-
     }
 }

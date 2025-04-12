@@ -3,33 +3,31 @@ using BarberApp.Domain.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BarberApp.Application.Services
 {
     public class AppointmentService : IAppointmentService
     {
-        private readonly IAppointmentRepositiory _appointmentRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
         private readonly ILogger<AppointmentService> _logger;
 
-        public AppointmentService(IAppointmentRepositiory appointmentRepository, ILogger<AppointmentService> logger)
+        public AppointmentService(IAppointmentRepository appointmentRepository, ILogger<AppointmentService> logger)
         {
             _appointmentRepository = appointmentRepository;
             _logger = logger;
         }
+
         public async Task AddAppointment(Appointment appointment)
         {
             try
             {
-                await _appointmentRepository.AddAppointments(appointment);
-
-            }catch(Exception ex)
+                await _appointmentRepository.AddAppointment(appointment);
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding a new appointment.");
                 throw;
-
             }
         }
 
@@ -37,13 +35,12 @@ namespace BarberApp.Application.Services
         {
             try
             {
-                await _appointmentRepository.DeleteAppointments(id);
-
-            }catch(Exception ex)
+                await _appointmentRepository.DeleteAppointment(id);
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error deleting appointment with ID {id}.");
                 throw;
-
             }
         }
 
@@ -52,12 +49,11 @@ namespace BarberApp.Application.Services
             try
             {
                 return await _appointmentRepository.GetAllAppointments();
-
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all appointments.");
                 throw;
-
             }
         }
 
@@ -65,7 +61,12 @@ namespace BarberApp.Application.Services
         {
             try
             {
-                return await _appointmentRepository.GetAllAppointmentsById(id);
+                var appointment = await _appointmentRepository.GetAppointmentById(id);
+                if (appointment == null)
+                {
+                    throw new KeyNotFoundException($"Appointment with ID {id} not found.");
+                }
+                return appointment;
             }
             catch (Exception ex)
             {
@@ -78,14 +79,12 @@ namespace BarberApp.Application.Services
         {
             try
             {
-                await _appointmentRepository.UpdateAppointments(appointment);
-
+                await _appointmentRepository.UpdateAppointment(appointment);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating appointment with ID {appointment.id}.");
+                _logger.LogError(ex, $"Error updating appointment with ID {appointment.Id}.");
                 throw;
-
             }
         }
     }

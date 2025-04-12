@@ -2,56 +2,68 @@
 using BarberApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace BarberApp.Persistence.Repository
 {
-    public class AppointmentRepositiory : IAppointmentRepositiory
+    public class AppointmentRepository : IAppointmentRepository
     {
         private readonly BarberDbContext _context;
-        private readonly ILogger<AppointmentRepositiory> _logger;
+        private readonly ILogger<AppointmentRepository> _logger;
 
-        public AppointmentRepositiory(BarberDbContext context, ILogger<AppointmentRepositiory> logger)
+        public AppointmentRepository(BarberDbContext context, ILogger<AppointmentRepository> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task AddAppointments(Appointment appointment)
+        public async Task AddAppointment(Appointment appointment)
         {
             try
             {
-                if(appointment == null)
+                if (appointment == null)
                 {
                     throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null.");
                 }
+
+                // Validate date and time formats
+                if (!DateTime.TryParse(appointment.AppointmentDate, out _))
+                {
+                    throw new ArgumentException("Invalid date format. Use YYYY-MM-DD.", nameof(appointment.AppointmentDate));
+                }
+                if (!TimeSpan.TryParse(appointment.AppointmentTime, out _))
+                {
+                    throw new ArgumentException("Invalid time format. Use HH:MM.", nameof(appointment.AppointmentTime));
+                }
+
                 await _context.Appointment.AddAsync(appointment);
                 await _context.SaveChangesAsync();
-
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding a new appointment.");
-                throw new Exception("An error occurred while adding the appointment.");
-
+                throw;
             }
         }
 
-        public async Task DeleteAppointments(int id)
+        public async Task DeleteAppointment(int id)
         {
             try
             {
-                var appointments = await _context.Appointment.FindAsync(id);
-                if(appointments == null)
+                var appointment = await _context.Appointment.FindAsync(id);
+                if (appointment == null)
                 {
-                    throw new KeyNotFoundException("Appointment not found.");
+                    throw new KeyNotFoundException($"Appointment with ID {id} not found.");
                 }
-                _context.Appointment.Remove(appointments);
+                _context.Appointment.Remove(appointment);
                 await _context.SaveChangesAsync();
-
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error deleting appointment with ID {id}.");
                 throw;
-
             }
         }
 
@@ -60,59 +72,59 @@ namespace BarberApp.Persistence.Repository
             try
             {
                 return await _context.Appointment.AsNoTracking().ToListAsync();
-
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retriving all the appointmetns");
-                throw new Exception("Dataabse error occured while retriving the appointments");
-
+                _logger.LogError(ex, "Error retrieving all appointments.");
+                throw;
             }
         }
 
-        public async Task<Appointment?> GetAllAppointmentsById(int id)
+        public async Task<Appointment?> GetAppointmentById(int id)
         {
             try
             {
-                var appointments = await _context.Appointment.AsNoTracking().FirstOrDefaultAsync(a => a.id == id);
-
-                if(appointments == null)
-                {
-                    throw new KeyNotFoundException($"Appointment with ID {id} not found.");
-                    
-                }
-                return appointments;
-                
-
+                return await _context.Appointment.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error retrieving appointment with ID {id}.");
                 throw;
-
             }
         }
 
-        public async Task UpdateAppointments(Appointment appointment)
+        public async Task UpdateAppointment(Appointment appointment)
         {
             try
             {
-                if(appointment == null)
+                if (appointment == null)
                 {
                     throw new ArgumentNullException(nameof(appointment), "Appointment cannot be null.");
                 }
-                var existingAppointment = await _context.Appointment.FindAsync(appointment.id);
+
+                var existingAppointment = await _context.Appointment.FindAsync(appointment.Id);
                 if (existingAppointment == null)
-                    throw new KeyNotFoundException("Appointment not found.");
+                {
+                    throw new KeyNotFoundException($"Appointment with ID {appointment.Id} not found.");
+                }
+
+                // Validate date and time formats
+                if (!DateTime.TryParse(appointment.AppointmentDate, out _))
+                {
+                    throw new ArgumentException("Invalid date format. Use YYYY-MM-DD.", nameof(appointment.AppointmentDate));
+                }
+                if (!TimeSpan.TryParse(appointment.AppointmentTime, out _))
+                {
+                    throw new ArgumentException("Invalid time format. Use HH:MM.", nameof(appointment.AppointmentTime));
+                }
+
                 _context.Entry(existingAppointment).CurrentValues.SetValues(appointment);
                 await _context.SaveChangesAsync();
-
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error updating appointment with ID {appointment.id}.");
+                _logger.LogError(ex, $"Error updating appointment with ID {appointment.Id}.");
                 throw;
-
             }
         }
     }

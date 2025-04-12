@@ -1,4 +1,5 @@
-﻿using BarberApp.Application.Interface;
+﻿// BarberApp.Persistence/Repository/TeamRepository.cs
+using BarberApp.Application.Interface;
 using BarberApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -32,14 +33,14 @@ namespace BarberApp.Persistence.Repository
             }
         }
 
-        public async Task<Team> GetTeamMemberById(int id)
+        public async Task<Team> GetTeamMemberById(Guid id)
         {
             try
             {
-                var teamMember = await _context.Team.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+                var teamMember = await _context.Team.AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.Id == id);
                 if (teamMember == null)
                     throw new KeyNotFoundException($"Team member with ID {id} not found.");
-
                 return teamMember;
             }
             catch (Exception ex)
@@ -55,7 +56,6 @@ namespace BarberApp.Persistence.Repository
             {
                 if (team == null)
                     throw new ArgumentNullException(nameof(team), "Team member cannot be null.");
-
                 await _context.Team.AddAsync(team);
                 await _context.SaveChangesAsync();
             }
@@ -66,14 +66,13 @@ namespace BarberApp.Persistence.Repository
             }
         }
 
-        public async Task DeleteTeamMember(int id)
+        public async Task DeleteTeamMember(Guid id)
         {
             try
             {
                 var teamMember = await _context.Team.FindAsync(id);
                 if (teamMember == null)
-                    throw new KeyNotFoundException("Team member not found.");
-
+                    throw new KeyNotFoundException($"Team member with ID {id} not found.");
                 _context.Team.Remove(teamMember);
                 await _context.SaveChangesAsync();
             }
@@ -90,11 +89,9 @@ namespace BarberApp.Persistence.Repository
             {
                 if (team == null)
                     throw new ArgumentNullException(nameof(team), "Team member cannot be null.");
-
                 var existingMember = await _context.Team.FindAsync(team.Id);
                 if (existingMember == null)
-                    throw new KeyNotFoundException("Team member not found.");
-
+                    throw new KeyNotFoundException($"Team member with ID {team.Id} not found.");
                 _context.Entry(existingMember).CurrentValues.SetValues(team);
                 await _context.SaveChangesAsync();
             }

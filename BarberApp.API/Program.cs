@@ -25,10 +25,10 @@ internal class Program
         builder.Services.AddOpenApi();
 
         // 🔹 Register Database Context for SQL Server
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         builder.Services.AddDbContext<BarberDbContext>(options =>
-            options.UseSqlServer(connectionString));
+     options.UseSqlServer(
+         builder.Configuration.GetConnectionString("DefaultConnection"),
+         b => b.MigrationsAssembly("BarberApp.Persistence")));
 
         // 🔹 Configure Identity with custom options
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -105,7 +105,7 @@ internal class Program
         builder.Services.AddScoped<ITeamService, TeamService>();
         builder.Services.AddScoped<IOurServicesRepository, OurServicesRepository>();
         builder.Services.AddScoped<IOurServicesService, OurServicesService>();
-        builder.Services.AddScoped<IAppointmentRepositiory, AppointmentRepositiory>();
+        builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         builder.Services.AddScoped<IAppointmentService, AppointmentService>();
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IAuthService, AuthServices>();

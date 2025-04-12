@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BarberApp.Persistence.Migrations
 {
     [DbContext(typeof(BarberDbContext))]
-    [Migration("20250411101949_changedb")]
-    partial class changedb
+    [Migration("20250412044411_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,7 @@ namespace BarberApp.Persistence.Migrations
             modelBuilder.HasSequence<int>("OurServicesDataSequence")
                 .StartsAt(123L);
 
-            modelBuilder.Entity("BarberApp.Domain.ApplicationUser", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -40,6 +40,9 @@ namespace BarberApp.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -50,6 +53,12 @@ namespace BarberApp.Persistence.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -74,6 +83,10 @@ namespace BarberApp.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -97,7 +110,7 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.Appointment", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.Appointment", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -131,7 +144,7 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("Appointment");
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.Category", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,14 +154,15 @@ namespace BarberApp.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.OurServices", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.OurServices", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -173,7 +187,7 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("OurServices");
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.OurServicesData", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.OurServicesData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,7 +223,7 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("OurServicesData");
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.Product", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -248,28 +262,30 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.Team", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.Team", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProfileImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Specialty")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -409,9 +425,9 @@ namespace BarberApp.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.OurServicesData", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.OurServicesData", b =>
                 {
-                    b.HasOne("BarberApp.Domain.OurServices", null)
+                    b.HasOne("BarberApp.Domain.Models.OurServices", null)
                         .WithMany("Data")
                         .HasForeignKey("OurServicesId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -428,7 +444,7 @@ namespace BarberApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BarberApp.Domain.ApplicationUser", null)
+                    b.HasOne("BarberApp.Domain.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -437,7 +453,7 @@ namespace BarberApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BarberApp.Domain.ApplicationUser", null)
+                    b.HasOne("BarberApp.Domain.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -452,7 +468,7 @@ namespace BarberApp.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BarberApp.Domain.ApplicationUser", null)
+                    b.HasOne("BarberApp.Domain.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,14 +477,14 @@ namespace BarberApp.Persistence.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BarberApp.Domain.ApplicationUser", null)
+                    b.HasOne("BarberApp.Domain.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BarberApp.Domain.OurServices", b =>
+            modelBuilder.Entity("BarberApp.Domain.Models.OurServices", b =>
                 {
                     b.Navigation("Data");
                 });
