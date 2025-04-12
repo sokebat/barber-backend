@@ -1,8 +1,6 @@
-﻿// BarberApp.API/Controllers/TeamController.cs
-using BarberApp.Application.Interface;
+﻿using BarberApp.Application.Interface;
 using BarberApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace BarberApp.API.Controllers
 {
@@ -32,6 +30,7 @@ namespace BarberApp.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new
+
                 {
                     message = "An error occurred while retrieving team members.",
                     error = ex.Message
@@ -39,17 +38,17 @@ namespace BarberApp.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            if (!Guid.TryParse(id, out var guidId))
+            if (id <= 0)
             {
-                return BadRequest(new { message = "Invalid team member ID format." });
+                return BadRequest(new { message = "Invalid team member ID." });
             }
 
             try
             {
-                var teamMember = await _teamService.GetTeamMemberById(guidId);
+                var teamMember = await _teamService.GetTeamMemberById(id);
                 if (teamMember == null)
                 {
                     return NotFound(new { message = $"Team member with ID {id} not found." });
@@ -103,10 +102,10 @@ namespace BarberApp.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTeamMember(string id, [FromBody] Team team)
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateTeamMember(int id, [FromBody] Team team)
         {
-            if (!Guid.TryParse(id, out var guidId) || team == null || guidId != team.Id)
+            if (id <= 0 || team == null || id != team.Id)
             {
                 return BadRequest(new { message = "Team member data is invalid or ID mismatch." });
             }
@@ -130,17 +129,17 @@ namespace BarberApp.API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeamMember(string id)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteTeamMember(int id)
         {
-            if (!Guid.TryParse(id, out var guidId))
+            if (id <= 0)
             {
-                return BadRequest(new { message = "Invalid team member ID format." });
+                return BadRequest(new { message = "Invalid team member ID." });
             }
 
             try
             {
-                await _teamService.DeleteTeamMember(guidId);
+                await _teamService.DeleteTeamMember(id);
                 return NoContent();
             }
             catch (KeyNotFoundException ex)

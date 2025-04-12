@@ -5,9 +5,9 @@ namespace BarberApp.Application.Interface
     public interface ITeamService
     {
         Task<List<Team>> GetAllTeamMember();
-        Task<Team> GetTeamMemberById(Guid id);
+        Task<Team> GetTeamMemberById(int id);
         Task AddTeamMember(Team team);
-        Task DeleteTeamMember(Guid id);
+        Task DeleteTeamMember(int id);
         Task UpdateTeamMember(Team team);
     }
 }

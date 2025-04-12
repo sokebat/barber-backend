@@ -1,5 +1,4 @@
-﻿// BarberApp.Application/Services/TeamService.cs
-using BarberApp.Application.Interface;
+﻿using BarberApp.Application.Interface;
 using BarberApp.Domain.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -32,7 +31,7 @@ namespace BarberApp.Application.Services
             }
         }
 
-        public async Task<Team> GetTeamMemberById(Guid id)
+        public async Task<Team> GetTeamMemberById(int id)
         {
             try
             {
@@ -58,7 +57,7 @@ namespace BarberApp.Application.Services
             }
         }
 
-        public async Task DeleteTeamMember(Guid id)
+        public async Task DeleteTeamMember(int id)
         {
             try
             {

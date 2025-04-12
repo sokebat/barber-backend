@@ -5,9 +5,7 @@ namespace BarberApp.Domain.Models
 {
     public class Product
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int Id { get; set; } // Removed [DatabaseGenerated] as it’s handled in OnModelCreating
 
         [Required(ErrorMessage = "Product name is required.")]
         [StringLength(100, ErrorMessage = "Product name cannot exceed 100 characters.")]

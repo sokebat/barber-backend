@@ -24,11 +24,10 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
 
-        // 🔹 Register Database Context for SQL Server
         builder.Services.AddDbContext<BarberDbContext>(options =>
-     options.UseSqlServer(
-         builder.Configuration.GetConnectionString("DefaultConnection"),
-         b => b.MigrationsAssembly("BarberApp.Persistence")));
+            options.UseSqlite(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                b => b.MigrationsAssembly("BarberApp.Persistence")));
 
         // 🔹 Configure Identity with custom options
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
